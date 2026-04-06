@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daraz Trust Meter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #f2f4f7;
+            text-align: center;
+            /* padding: 60px 20px; */
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            font-size: 32px;
+        }
+
+        .search-box {
+            margin-bottom: 60px;
+        }
+
+        input {
+            width: 420px;
+            max-width: 90%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #bbb;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 22px;
+            font-size: 16px;
+            border: none;
+            background: #0B1F3A;
+            color: white;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        .meter {
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        svg {
+            width: 220px;
+            height: 220px;
+            transform: rotate(-90deg);
+        }
+
+        .bg {
+            fill: none;
+            stroke: #e6e6e6;
+            stroke-width: 14;
+        }
+
+        .progress {
+            fill: none;
+            stroke: #3fa7f5;
+            stroke-width: 14;
+            stroke-linecap: round;
+            stroke-dasharray: 628;
+            stroke-dashoffset: 628;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        #meterText {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 42px;
+            color: #111;
+        }
+
+        .result-box {
+            margin-top: 10px;
+        }
+
+        #title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        #rating, #price, #trustLabel {
+            font-size: 20px;
+            margin: 10px 0;
+        }
+        .footer p{
+            position: fixed;
+            top: 10px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            color: #121212;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Daraz Product Trust Meter</h1>
+
+    <div class="search-box">
+        <input id="url" type="text" placeholder="Paste Daraz product URL">
+        <button onclick="analyze()">Analyze</button>
+    </div>
+
+    <div class="meter">
+        <svg viewBox="0 0 220 220">
+            <circle class="bg" cx="110" cy="110" r="100"></circle>
+            <circle id="progress" class="progress" cx="110" cy="110" r="100"></circle>
+        </svg>
+        <div id="meterText">0%</div>
+    </div>
+
+    <div class="result-box">
+        <div id="title">Title: -</div>
+        <div id="price">Price: -</div>
+        <div id="rating">Rating: -</div>
+        <div id="trustLabel">Trust Label: -</div>
+    </div>
+
+    <div class="footer">
+           <p> Developed by Team EarthQuake </p>
+    </div>
+
+    <script>
+        const radius = 100;
+        const circumference = 2 * Math.PI * radius;
+
+        function setMeter(percent) {
+            const circle = document.getElementById("progress");
+            percent = Number(percent) || 0;
+
+            const offset = circumference - (percent / 100) * circumference;
+            circle.style.strokeDasharray = circumference;
+            circle.style.strokeDashoffset = offset;
+
+            document.getElementById("meterText").innerText = percent + "%";
+        }
+
+        async function analyze() {
+            setMeter(0);
+
+            document.getElementById("title").innerText = "Title: Loading...";
+            document.getElementById("price").innerText = "Price: Loading...";
+            document.getElementById("rating").innerText = "Rating: Loading...";
+            document.getElementById("trustLabel").innerText = "Trust Label: Loading...";
+
+            const url = document.getElementById("url").value.trim();
+
+            if (!url) {
+                alert("Please enter a valid URL");
+                return;
+            }
+
+            try {
+                const res = await fetch("/analyze", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ url: url })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    document.getElementById("title").innerText = "Error: " + (data.error || "Something went wrong");
+                    document.getElementById("price").innerText = "Price: -";
+                    document.getElementById("rating").innerText = "Rating: -";
+                    document.getElementById("trustLabel").innerText = "Trust Label: -";
+                    setMeter(0);
+                    return;
+                }
+
+                setMeter(data.trust_meter || 0);
+                document.getElementById("title").innerText = (data.title || "-");
+                document.getElementById("price").innerText = "Price: " + (data.price ?? "-");
+                document.getElementById("rating").innerText = "Rating: " + (data.rating ?? "-");
+                document.getElementById("trustLabel").innerText = "Trust Label: " + (data.trust_label || "-");
+
+            } catch (error) {
+                document.getElementById("title").innerText = "Error: " + error.message;
+                setMeter(0);
+            }
+        }
+
+        setMeter(0);
+    </script>
+
+</body>
+</html>
