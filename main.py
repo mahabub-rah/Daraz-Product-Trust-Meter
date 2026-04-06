@@ -7,7 +7,9 @@ from senti import SentimentAnalyzer
 from trust import TrustMeter
 
 app = FastAPI()
+
 templates = Jinja2Templates(directory="templates")
+templates.env.cache = None  
 
 
 class URLRequest(BaseModel):
