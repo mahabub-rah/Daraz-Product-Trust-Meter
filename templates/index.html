@@ -94,7 +94,11 @@
             margin-bottom: 16px;
         }
 
-        #rating, #price, #trustLabel {
+        #trustLabel {
+            font-size: 20px;
+            margin: 10px 0;
+        }
+        #rating, #price{
             font-size: 20px;
             margin: 10px 0;
         }
@@ -128,9 +132,9 @@
 
     <div class="result-box">
         <div id="title">Title: -</div>
+        <div id="trustLabel">Trust Label: - </div>
         <div id="price">Price: -</div>
         <div id="rating">Rating: -</div>
-        <div id="trustLabel">Trust Label: -</div>
     </div>
 
     <div class="footer">
@@ -156,9 +160,9 @@
             setMeter(0);
 
             document.getElementById("title").innerText = "Title: Loading...";
+            document.getElementById("trustLabel").innerText = "Trust Label: Loading...";
             document.getElementById("price").innerText = "Price: Loading...";
             document.getElementById("rating").innerText = "Rating: Loading...";
-            document.getElementById("trustLabel").innerText = "Trust Label: Loading...";
 
             const url = document.getElementById("url").value.trim();
 
@@ -180,18 +184,18 @@
 
                 if (!res.ok) {
                     document.getElementById("title").innerText = "Error: " + (data.error || "Something went wrong");
+                    document.getElementById("trustLabel").innerText = "Trust Label: -";
                     document.getElementById("price").innerText = "Price: -";
                     document.getElementById("rating").innerText = "Rating: -";
-                    document.getElementById("trustLabel").innerText = "Trust Label: -";
                     setMeter(0);
                     return;
                 }
 
                 setMeter(data.trust_meter || 0);
                 document.getElementById("title").innerText = (data.title || "-");
+                document.getElementById("trustLabel").innerText = "Trust Label: " + (data.trust_label || "-");
                 document.getElementById("price").innerText = "Price: " + (data.price ?? "-");
                 document.getElementById("rating").innerText = "Rating: " + (data.rating ?? "-");
-                document.getElementById("trustLabel").innerText = "Trust Label: " + (data.trust_label || "-");
 
             } catch (error) {
                 document.getElementById("title").innerText = "Error: " + error.message;

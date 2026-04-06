@@ -1,4 +1,5 @@
 # 🛡️ Daraz Product Trust Meter
+![image](image.png)
 
 An AI-powered web tool that analyzes Daraz product reviews and calculates a **Trust Score** using **sentiment analysis, product ratings, and review volume**.
 
