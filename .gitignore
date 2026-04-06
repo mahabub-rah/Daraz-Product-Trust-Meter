@@ -1,3 +1,4 @@
 .env
 __pycache__/
-calculate.py 
+*.pyc
+calculate.py
